@@ -1,0 +1,65 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  font-size: 20px;
+}
+
+.confirmCase {
+  color: #696969
+}
+
+.deathCase {
+  color: #ff2b00
+}
+
+.recoveredCase {
+  color: #4bbc0e;
+}
+
+.card p {
+  font-weight: bold;
+}
+
+.info {
+  padding: 20px;
+}
+
+.info p {
+  margin: 5px 0px;
+}
+
+.card p span {
+  font-weight: normal;
+}
+
+.card .new {
+  /* background-color: #4bbc0e */
+  border: 1px solid #4bbc0e
+}
+
+.card .total {
+  /* background-color: #9fc14e */
+  border: 1px solid #9fc14e
+}
+
+@media only screen and (min-width: 550px){
+}
+@media only screen and (min-width: 768px){
+}
+@media only screen and (min-width: 1024px){
+  .card {
+    flex-direction: row;
+  }
+}
+@media only screen and (min-width: 1128px){
+  .card {
+    flex-direction: row;
+  }
+}
+@media only screen and (min-width: 1920px){
+}

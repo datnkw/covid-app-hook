@@ -1,0 +1,64 @@
+.wrapper {
+  width: 100vw;
+  height: 100vh;
+
+  background-color: #fff;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+}
+
+.inputWrapper p{
+  text-align: left;
+  font-size: 30px;
+  padding: 20px;
+}
+
+.inputWrapper input {
+  margin-top: 10px;
+  height: 50px;
+  width: 300px;
+}
+
+.logo {
+  margin-right: 30px;
+}
+
+.submit {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #6b8e23;
+  color: #fff;
+  font-size: 20px;
+
+  width: 100px;
+  border-radius: 10px;
+  text-align: center;
+
+  cursor: pointer;
+
+  margin: 40px auto;
+}
+
+@media only screen and (min-width: 550px){
+  .wrapper {
+    flex-direction: column;
+  }
+}
+@media only screen and (min-width: 768px){
+
+}
+@media only screen and (min-width: 1024px){
+
+}
+@media only screen and (min-width: 1128px){
+
+}
+@media only screen and (min-width: 1920px){
+  .wrapper {
+    flex-direction: row;
+  }
+}

@@ -1,0 +1,68 @@
+.wrapper {
+  width: fit-content;
+  margin: 0 auto;
+
+  display: flex;
+
+  font-weight: bold;
+  font-size: 40px;
+}
+
+.btnPagination {
+  position: relative;
+
+  background-color: #6b8e23;
+  color: #fff;
+
+  width: 80px;
+  height: 80px;
+
+  border-radius: 5px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 10px;
+
+  cursor: pointer;
+}
+
+.hiddenBtn {
+  display: none !important;
+}
+
+.blankBtn {
+  background-color: #fff;
+  color: #6b8e23;
+  cursor: default !important;
+}
+
+.preBtn:after{
+  content: '\003c';
+  position: absolute;
+}
+
+.nextBtn:after{
+  content: "\003e";
+  position: absolute;
+}
+
+.numberPagination {
+  display: none;
+}
+
+@media only screen and (min-width: 550px){
+}
+@media only screen and (min-width: 768px){
+}
+@media only screen and (min-width: 1024px){
+  
+}
+@media only screen and (min-width: 1128px){
+  .numberPagination {
+    display: flex;
+  }
+}
+@media only screen and (min-width: 1920px){
+}

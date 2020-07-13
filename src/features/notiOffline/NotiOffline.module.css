@@ -1,0 +1,22 @@
+.warning {
+  background-color: #ff6600;
+  color: #fff;
+
+  padding: 20px;
+  font-size: 20px;
+
+  position: absolute;
+  top: 0px;
+
+  width: 100%;
+
+  text-align: center;
+
+  margin-top: -80px;
+
+  transition: all 1s ease-in;
+}
+
+.disconnect {
+  margin-top: 0px;
+}
