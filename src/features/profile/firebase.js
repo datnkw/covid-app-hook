@@ -13,8 +13,6 @@ const firebaseConfig = {
   measurementId: "G-6F7Q7BPE8M"
 };
 
-let count = 1;
-
 firebase.initializeApp(firebaseConfig);
 
 export default firebase;

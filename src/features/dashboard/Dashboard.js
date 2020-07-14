@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 import Loading from "../loading/Loading";
 import InfoByCard from "../InfoByCase/InfoByCase";
@@ -17,23 +17,10 @@ import HocPagination from "../hocPagination/HocPagination";
 const ITEM_PER_PAGE = 15;
 const DEFAULT_URL = '/world';
 
-class CountryItem extends React.Component {
-  // {
-  //   "Country": "Afghanistan",
-  //   "CountryCode": "AF",
-  //   "Slug": "afghanistan",
-  //   "NewConfirmed": 165,
-  //   "TotalConfirmed": 30616,
-  //   "NewDeaths": 20,
-  //   "TotalDeaths": 703,
-  //   "NewRecovered": 368,
-  //   "TotalRecovered": 10674,
-  //   "Date": "2020-06-29T04:06:12Z"
-  // }
-
-  render() {
-    const { Country, TotalConfirmed } = this.props.info;
+function CountryItem(props) {
+    const { Country, TotalConfirmed } = props.info;
     const itemUrl = "/country/" + Country;
+
     return (
       <Link to={itemUrl}>
         <div className={styles.countryItem}>
@@ -42,90 +29,83 @@ class CountryItem extends React.Component {
         </div>
       </Link>
     );
-  }
 }
 
-class CountryItemList extends React.Component {
-  render() {
-    const { countryItemList } = this.props;
+function CountryItemList(props) {
+    const { countryItemList } = props;
+
     return countryItemList
       ? countryItemList.map((item) => (
           <CountryItem key={item.Slug} info={item} />
         ))
       : null;
-  }
 }
 
-class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
+function Dashboard(props){
+  const [loading, setLoading] = useState(true);
+  let summaryGlobalInfo, summaryCountries;
 
-    this.state = {
-      loading: true,
-    };
-  }
-
-  async getInfo() {
+  const getInfo = async () => {
     const url = config.api + "/summary";
     if (window.navigator.onLine) {
       await axios.get(url).then((response) => {
-        this.summaryGlobalInfo = response.data.Global;
-        this.summaryCountries = response.data.Countries;
+        summaryGlobalInfo = response.data.Global;
+        summaryCountries = response.data.Countries;
 
-        this.props.setData(response.data.Countries.reverse());
+        props.setData(response.data.Countries.reverse());
 
         localStorage.setItem(
           "summaryGlobalInfo",
-          JSON.stringify(this.summaryGlobalInfo)
+          JSON.stringify(summaryGlobalInfo)
         );
         localStorage.setItem(
           "summaryCountries",
-          JSON.stringify(this.summaryCountries)
+          JSON.stringify(summaryCountries)
         );
       });
     } else {
-      this.summaryGlobalInfo = JSON.parse(
+      summaryGlobalInfo = JSON.parse(
         localStorage.getItem("summaryGlobalInfo")
       );
-      this.summaryCountries = JSON.parse(
+      summaryCountries = JSON.parse(
         localStorage.getItem("summaryCountries")
       );
     }
 
-    this.setState({ loading: false });
-    this.props.setVisibilitySplashScreen();
+    setLoading(false);
+    props.setVisibilitySplashScreen();
   }
 
-  async componentDidMount() {
-    await this.getInfo();
-    this.props.setItemSideBarChoosen("World");
-  }
+  useEffect(async () => {
+    await getInfo();
+    props.setItemSideBarChoosen("World");
+  }, [])
 
-  render() {
-    if (!this.props.hasShowOffSplashScreen) {
+  
+    if (!props.hasShowOffSplashScreen) {
       return <SplashScreen />;
     }
 
-    if (this.state.loading) {
+    if (loading) {
       return <Loading />;
     }
     return (
       <div className="full-width">
         <SideBar itemSideBarChoosen="World" />
         <div className={className(styles.wrapper, "content")}>
-        <InfoByCard cases={this.summaryGlobalInfo} />
+        <InfoByCard cases={summaryGlobalInfo} />
           <div className={styles.countryItemWrapper}>
-            <CountryItemList countryItemList={this.props.dataCurrentPage} />
+            <CountryItemList countryItemList={props.dataCurrentPage} />
           </div>
           <Pagination
-            setPage={this.props.setPage}
-            page={this.props.page}
-            maxPage={this.props.maxPage}
+            setPage={props.setPage}
+            page={props.page}
+            maxPage={props.maxPage}
           />
         </div>
       </div>
     );
-  }
+  
 }
 
 export default HocPagination(Dashboard, ITEM_PER_PAGE, DEFAULT_URL);
