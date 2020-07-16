@@ -2,9 +2,9 @@ import React from "react";
 import Styles from "./InfoByCase.module.css";
 import classNames from "classnames";
 
-class InfoByCase extends React.Component {
-  render() {
-    const { cases } = this.props;
+function InfoByCase(props){
+  
+    const { cases } = props;
     return (
       
       <div className={Styles.card}>
@@ -40,7 +40,7 @@ class InfoByCase extends React.Component {
         </div>{" "}
       </div>
     );
-  }
+  
 }
 
 export default InfoByCase;
