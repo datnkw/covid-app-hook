@@ -1,0 +1,36 @@
+@import "../../styles/App.css";
+.wrapper {
+  padding: 20px;
+}
+
+.headerTime {
+  width: fit-content;
+  margin: 0 auto;
+
+  font-size: 20px;
+}
+
+.header {
+  width: fit-content;
+  margin: 0 auto;
+
+  margin-top: 30px;
+  margin-bottom: 20px;
+
+  font-size: 30px;
+  font-weight: bold;
+}
+
+@media only screen and (min-width: 550px){
+}
+@media only screen and (min-width: 768px){
+}
+@media only screen and (min-width: 1024px){
+  .header {
+    font-size: 30px;
+  }
+}
+@media only screen and (min-width: 1128px){
+}
+@media only screen and (min-width: 1920px){
+}

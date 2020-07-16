@@ -1,0 +1,40 @@
+.splashWrapper{
+  position: absolute;
+
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  background-color: #fff;
+}
+
+.splashWrapper p {
+  margin-top: 20px;
+  font-size: 30px;
+}
+
+.logo {
+  background-image: url("../../images/covid.png");
+  background-size: cover;
+
+  width: 200px;
+  height: 200px;
+
+  animation: App-logo-float infinite 1s ease-in-out;
+}
+
+@keyframes App-logo-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px)
+  }
+  100% {
+    transform: translateY(0px)
+  }
+}
