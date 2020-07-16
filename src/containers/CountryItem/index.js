@@ -75,6 +75,8 @@ function ByDateItemList(props) {
 function getInfoByPage(page, data) {
   const positionFirstItem = data.length - page * ITEM_PER_PAGE;
 
+  console.log("data length: ", data.length);
+
   if (positionFirstItem >= 0) {
     return data.slice(positionFirstItem, positionFirstItem + ITEM_PER_PAGE);
   } else {
@@ -126,6 +128,7 @@ function CountryInfo(props) {
         localStorage.setItem("maxPage", maxPage);
         localStorage.setItem("data", JSON.stringify(data));
       }).catch(error => {
+        console.log("error get info country");
         console.log(error);
       });
     } else {
