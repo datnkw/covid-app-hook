@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext, useReducer } from "react";
 import Styles from "./Profile.module.css";
 import Firebase from "../../utils/Firebase";
 import Loading from "../../components/Loading";
@@ -8,53 +8,72 @@ import SplashScreen from "../../components/SplashScreen";
 import { UserContext } from "../../utils/UserContext";
 import { withRouter } from "react-router-dom";
 
-class Profile extends React.Component {
-  static contextType = UserContext;
-  constructor(props) {
-    super(props);
-    this.state = {
-      firstName: "123",
-      lastName: "",
-      email: "",
-      location: "",
-      healthStatus: "",
-      meetRelatedCovid: "",
-      loading: true,
-    };
-
-    this.db = Firebase.firestore();
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'firstName':
+      return {
+        ...state,
+        firstName: action.value
+      };
+      case 'lastName':
+        return {
+          ...state,
+          lastName: action.value
+        };
+        case 'location':
+          return {
+            ...state,
+            location: action.value
+          };
+          case 'healthStatus':
+            return {
+              ...state,
+              healthStatus: action.value
+            };
+            case 'meetRelatedCovid':
+              return {
+                ...state,
+                meetRelatedCovid: action.value
+              };
+            default:
+              return {
+                ...action.value
+              };
+                        
   }
+}
 
-  handleChange(event) {
+const initialInfo = {
+  firstName: "",
+    lastName: "",
+    location: "",
+    healthStatus: "",
+    meetRelatedCovid: ""
+}
+
+function Profile(props) {
+  const UserContextInstance = useContext(UserContext);
+
+  const [loading, setLoading] = useState(true);
+  const [info, setInfo] = useReducer(reducer, initialInfo);
+  const [db] = useState(Firebase.firestore());
+  
+  const handleChange = (event) => {
     const target = event.target;
-    this.setState({
-      [target.name]: [target.value],
-    });
-  }
+    setInfo({
+      type: target.name,
+      value: target.value
+    })
+  };
 
-  handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    alert(
-      "A name was submitted: " +
-        this.state.firstName +
-        " " +
-        this.state.lastName
-    );
-
-    this.db
+    db
       .collection("profiles")
-      .doc(this.context.authentication.id)
+      .doc(UserContextInstance.authentication.id)
       .set({
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        email: this.state.email,
-        location: this.state.location,
-        healthStatus: this.state.healthStatus,
-        meetRelatedCovid: this.state.meetRelatedCovid,
+        ...info
       })
       .then(function () {
         alert("Document successfully written!");
@@ -64,41 +83,36 @@ class Profile extends React.Component {
       });
   }
 
-  setStateInfo(state) {
-    this.setState({
-      ...state,
-    });
-  }
-
-  async componentDidMount() {
-    if (!this.context.authentication.isLogin) {
-      this.props.history.push({
+  useEffect(() => {
+    if (!UserContextInstance.authentication.isLogin) {
+      props.history.push({
         pathname: "/login",
-        state: { from: this.props.location.pathname },
+        state: { from: props.location.pathname },
       });
       return;
     }
 
     if (window.navigator.onLine) {
-      await this.db
+      db
         .collection("profiles")
-        .doc(this.context.authentication.id)
+        .doc(UserContextInstance.authentication.id)
         .get()
         .then((querySnapshot) => {
-          this.setStateInfo(querySnapshot.data());
+          setInfo({
+            value: querySnapshot.data()
+          });
           localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
         });
     } else {
-      this.setStateInfo(JSON.parse(localStorage.getItem("data")));
+      setInfo({
+        value: JSON.parse(localStorage.getItem("data"))
+      });
     }
 
-    this.setState({
-      loading: false,
-    });
-    this.props.setVisibilitySplashScreen();
-  }
+    setLoading(false);
+    props.setVisibilitySplashScreen();
+  }, [])
 
-  render() {
     const labels = {
       firstName: "First name",
       lastName: "Last name",
@@ -107,11 +121,11 @@ class Profile extends React.Component {
       meetRelatedCovid: "Are you meeting someone who is related to Covid-19",
     };
 
-    if (!this.props.hasShowOffSplashScreen) {
+    if (!props.hasShowOffSplashScreen) {
       return <SplashScreen />;
     }
 
-    if (this.state.loading) {
+    if (loading) {
       return <Loading />;
     }
 
@@ -120,7 +134,7 @@ class Profile extends React.Component {
         <SideBar itemSideBarChoosen="Profile" />
         <div className={className(Styles.wrapper, "content")}>
           <h1 className={Styles.header}> Your profile </h1>{" "}
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit}>
             {" "}
             {Object.keys(labels).map((item) => {
               return (
@@ -129,8 +143,8 @@ class Profile extends React.Component {
                   <input
                     name={[item]}
                     type="text"
-                    value={this.state[item]}
-                    onChange={this.handleChange}
+                    value={info[item]}
+                    onChange={handleChange}
                   />{" "}
                 </div>
               );
@@ -140,7 +154,7 @@ class Profile extends React.Component {
         </div>{" "}
       </div>
     );
-  }
+  
 }
 
 export default withRouter(Profile);
