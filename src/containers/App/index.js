@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext, useReducer } from "react";
 import Dashboard from "../Dashboard";
 import CountryInfo from "../CountryItem";
 import Profile from "../Profile";
@@ -26,81 +26,59 @@ function RenderCountryInfo(props) {
   );
 }
 
-class App extends React.Component {
-  static contextType = UserContext;
-  constructor(props) {
-    super(props);
+function App(props) {
+  const UserContextInstance = useContext(UserContext);
 
-    this.state = {
-      hasShowOffSplashScreen: false,
-      isTimeOutSplashScreen: false,
-      isLoadingDataDone: false,
-      itemSideBarChoosen: "",
-      authentication: { isLogin: false, email: null, id: null },
-    };
+  const [hasShowOffSplashScreen, setHasShowOffSplashScreen] = useState(false);
+  const [authentication, setAuthentication] = useState({
+    isLogin: false, 
+    email: null, 
+    id: null 
+  })
 
-    this.setVisibilitySplashScreen = this.setVisibilitySplashScreen.bind(this);
-    this.setItemSideBarChoosen = this.setItemSideBarChoosen.bind(this);
-  }
-
-  checkLogin = async () => {
+  const checkLogin = async () => {
     await firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        // User is signed in.
-        this.context.login(user.email, user.uid);
+        UserContextInstance.login(user.email, user.uid);
         
-        this.setState({
-          authentication: { ...this.context.authentication },
-        });
+        setAuthentication({...UserContextInstance.authentication});
       }
     });
   };
 
-  setVisibilitySplashScreen() {
-    this.setState({
-      hasShowOffSplashScreen: true,
-    });
+  const setVisibilitySplashScreen = () => {
+    setHasShowOffSplashScreen(true);
   }
 
-  setItemSideBarChoosen(item) {
-    this.setState({
-      itemSideBarChoosen: item,
-    });
-  }
+  useEffect(() => {
+    checkLogin();
+  }, [])
 
-  componentDidMount() {
-    this.checkLogin();
-  }
-
-  login = (email, id) => {
-    this.setState({
-      authentication: {
+  const login = (email, id) => {
+    setAuthentication({
         isLogin: true, 
         email,
         id
-      }
-    })
+      })
   }
 
-  logout = async () => {
+  const logout = async () => {
     await firebase.auth().signOut().catch(function(error) {
+      alert("log out failed");
     });
-    this.setState({
-      authentication: {
-        isLogin: false, 
+    setAuthentication({
+      isLogin: false, 
         email: null,
         id: null
-      }
     })
   }
 
-  render() {
     return (
       <UserContext.Provider
         value={{
-          authentication: this.state.authentication,
-          logout: this.logout,
-          login: this.login,
+          authentication: authentication,
+          logout: logout,
+          login: login,
         }}
       >
         <div className="App">
@@ -110,26 +88,26 @@ class App extends React.Component {
               <Route exact path="/">
                 <CountryInfo
                   name="Vietnam"
-                  hasShowOffSplashScreen={this.state.hasShowOffSplashScreen}
-                  setVisibilitySplashScreen={this.setVisibilitySplashScreen}
+                  hasShowOffSplashScreen={hasShowOffSplashScreen}
+                  setVisibilitySplashScreen={setVisibilitySplashScreen}
                 />{" "}
               </Route>{" "}
               <Route path="/country/:name">
                 <RenderCountryInfo
-                  hasShowOffSplashScreen={this.state.hasShowOffSplashScreen}
-                  setVisibilitySplashScreen={this.setVisibilitySplashScreen}
+                  hasShowOffSplashScreen={hasShowOffSplashScreen}
+                  setVisibilitySplashScreen={setVisibilitySplashScreen}
                 />{" "}
               </Route>{" "}
               <Route path="/world">
                 <Dashboard
-                  hasShowOffSplashScreen={this.state.hasShowOffSplashScreen}
-                  setVisibilitySplashScreen={this.setVisibilitySplashScreen}
+                  hasShowOffSplashScreen={hasShowOffSplashScreen}
+                  setVisibilitySplashScreen={setVisibilitySplashScreen}
                 />{" "}
               </Route>{" "}
               <Route path="/profile">
                 <Profile
-                  hasShowOffSplashScreen={this.state.hasShowOffSplashScreen}
-                  setVisibilitySplashScreen={this.setVisibilitySplashScreen}
+                  hasShowOffSplashScreen={hasShowOffSplashScreen}
+                  setVisibilitySplashScreen={setVisibilitySplashScreen}
                 />{" "}
               </Route>{" "}
               <Route path="/login">
@@ -140,7 +118,6 @@ class App extends React.Component {
         </div>
       </UserContext.Provider>
     );
-  }
+  
 }
-//App.contextType = UserContext;
 export default App;

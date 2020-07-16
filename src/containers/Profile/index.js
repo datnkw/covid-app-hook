@@ -10,46 +10,45 @@ import { withRouter } from "react-router-dom";
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'firstName':
+    case "firstName":
       return {
         ...state,
-        firstName: action.value
+        firstName: action.value,
       };
-      case 'lastName':
-        return {
-          ...state,
-          lastName: action.value
-        };
-        case 'location':
-          return {
-            ...state,
-            location: action.value
-          };
-          case 'healthStatus':
-            return {
-              ...state,
-              healthStatus: action.value
-            };
-            case 'meetRelatedCovid':
-              return {
-                ...state,
-                meetRelatedCovid: action.value
-              };
-            default:
-              return {
-                ...action.value
-              };
-                        
+    case "lastName":
+      return {
+        ...state,
+        lastName: action.value,
+      };
+    case "location":
+      return {
+        ...state,
+        location: action.value,
+      };
+    case "healthStatus":
+      return {
+        ...state,
+        healthStatus: action.value,
+      };
+    case "meetRelatedCovid":
+      return {
+        ...state,
+        meetRelatedCovid: action.value,
+      };
+    default:
+      return {
+        ...action.value,
+      };
   }
 }
 
 const initialInfo = {
   firstName: "",
-    lastName: "",
-    location: "",
-    healthStatus: "",
-    meetRelatedCovid: ""
-}
+  lastName: "",
+  location: "",
+  healthStatus: "",
+  meetRelatedCovid: "",
+};
 
 function Profile(props) {
   const UserContextInstance = useContext(UserContext);
@@ -57,23 +56,22 @@ function Profile(props) {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useReducer(reducer, initialInfo);
   const [db] = useState(Firebase.firestore());
-  
+
   const handleChange = (event) => {
     const target = event.target;
     setInfo({
       type: target.name,
-      value: target.value
-    })
+      value: target.value,
+    });
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    db
-      .collection("profiles")
+    db.collection("profiles")
       .doc(UserContextInstance.authentication.id)
       .set({
-        ...info
+        ...info,
       })
       .then(function () {
         alert("Document successfully written!");
@@ -81,7 +79,7 @@ function Profile(props) {
       .catch(function (error) {
         alert("Error writing document: ", error);
       });
-  }
+  };
 
   useEffect(() => {
     if (!UserContextInstance.authentication.isLogin) {
@@ -93,68 +91,66 @@ function Profile(props) {
     }
 
     if (window.navigator.onLine) {
-      db
-        .collection("profiles")
+      db.collection("profiles")
         .doc(UserContextInstance.authentication.id)
         .get()
         .then((querySnapshot) => {
           setInfo({
-            value: querySnapshot.data()
+            value: querySnapshot.data(),
           });
           localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
         });
     } else {
       setInfo({
-        value: JSON.parse(localStorage.getItem("data"))
+        value: JSON.parse(localStorage.getItem("data")),
       });
     }
 
     setLoading(false);
     props.setVisibilitySplashScreen();
-  }, [])
+  }, []);
 
-    const labels = {
-      firstName: "First name",
-      lastName: "Last name",
-      location: "Location",
-      healthStatus: "Health status",
-      meetRelatedCovid: "Are you meeting someone who is related to Covid-19",
-    };
+  const labels = {
+    firstName: "First name",
+    lastName: "Last name",
+    location: "Location",
+    healthStatus: "Health status",
+    meetRelatedCovid: "Are you meeting someone who is related to Covid-19",
+  };
 
-    if (!props.hasShowOffSplashScreen) {
-      return <SplashScreen />;
-    }
+  if (!props.hasShowOffSplashScreen) {
+    return <SplashScreen />;
+  }
 
-    if (loading) {
-      return <Loading />;
-    }
+  if (loading) {
+    return <Loading />;
+  }
 
-    return (
-      <div className="full-width">
-        <SideBar itemSideBarChoosen="Profile" />
-        <div className={className(Styles.wrapper, "content")}>
-          <h1 className={Styles.header}> Your profile </h1>{" "}
-          <form onSubmit={handleSubmit}>
-            {" "}
-            {Object.keys(labels).map((item) => {
-              return (
-                <div className={Styles.itemInput} key={item}>
-                  <p> {labels[item]}: </p>{" "}
-                  <input
-                    name={[item]}
-                    type="text"
-                    value={info[item]}
-                    onChange={handleChange}
-                  />{" "}
-                </div>
-              );
-            })}{" "}
-            <input className={Styles.submit} type="submit" value="Submit" />
-          </form>{" "}
-        </div>{" "}
-      </div>
-    );
-  
+  return (
+    <div className="full-width">
+      <SideBar itemSideBarChoosen="Profile" />
+      <div className={className(Styles.wrapper, "content")}>
+        <h1 className={Styles.header}> Your profile </h1>{" "}
+        <form onSubmit={handleSubmit}>
+          {" "}
+          {Object.keys(labels).map((item) => {
+            return (
+              <div className={Styles.itemInput} key={item}>
+                <p> {labels[item]}: </p>{" "}
+                <input
+                  name={[item]}
+                  type="text"
+                  value={info[item]}
+                  onChange={handleChange}
+                />{" "}
+              </div>
+            );
+          })}{" "}
+          <input className={Styles.submit} type="submit" value="Submit" />
+        </form>{" "}
+      </div>{" "}
+    </div>
+  );
 }
 
 export default withRouter(Profile);
