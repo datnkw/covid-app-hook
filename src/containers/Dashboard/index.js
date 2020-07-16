@@ -63,8 +63,8 @@ function Dashboard(props) {
         );
       });
     } else {
-      summaryGlobalInfo = JSON.parse(localStorage.getItem("summaryGlobalInfo"));
-      summaryCountries = JSON.parse(localStorage.getItem("summaryCountries"));
+      setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryGlobalInfo")));
+      setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryCountries")));
     }
   };
 
@@ -80,7 +80,6 @@ function Dashboard(props) {
     return <Loading />;
   }
 
-  console.log("summaryGlobalInfo: ", summaryGlobalInfo);
   return (
     <div className="full-width">
       <SideBar itemSideBarChoosen="World" />

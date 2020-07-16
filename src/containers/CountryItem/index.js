@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Loading from "../../components/Loading";
 import config from "../../utils/config.json";
@@ -9,12 +9,12 @@ import SideBar from "../../components/SideBar";
 import className from "classnames";
 import { withRouter } from "react-router-dom";
 import Styles from "./CountryInfo.module.css";
-import queryString from 'query-string';
+import queryString from "query-string";
 
 const ITEM_PER_PAGE = 5;
 
-class ByDateItem extends React.Component {
-  getData(item, preItem) {
+function ByDateItem(props) {
+  function getData(item, preItem) {
     const TotalConfirmed = item.Confirmed;
     const TotalDeaths = item.Deaths;
     const TotalRecovered = item.Recovered;
@@ -32,48 +32,44 @@ class ByDateItem extends React.Component {
     };
   }
 
-  render() {
-    const transfomData = this.getData(this.props.item, this.props.preItem);
-    return (
-      <div>
-        <InfoByCase cases={transfomData} />{" "}
-      </div>
-    );
-  }
+  const transfomData = getData(props.item, props.preItem);
+  return (
+    <div>
+      <InfoByCase cases={transfomData} />{" "}
+    </div>
+  );
 }
 
-class ByDateItemList extends React.Component {
-  convertNormalFormatDate(dateString) {
+function ByDateItemList(props) {
+  function convertNormalFormatDate(dateString) {
     const date = new Date(dateString);
     return (
       date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
     );
   }
 
-  render() {
-    const { byDateItemList } = this.props;
+  const { byDateItemList, setItemSideBarChoosen, name } = props;
 
-    let result = [];
+  let result = [];
 
-    for (let i = byDateItemList.length - 1; i >= 0; i--) {
-      result.push(
-        <div key={i}>
-          <p className={Styles.headerTime}>
-            {" "}
-            {this.convertNormalFormatDate(byDateItemList[i].Date)}{" "}
-          </p>{" "}
-          <ByDateItem
-            item={byDateItemList[i]}
-            preItem={!i ? null : byDateItemList[i - 1]}
-            name={this.props.name}
-            setItemSideBarChoosen={this.props.setItemSideBarChoosen}
-          />{" "}
-        </div>
-      );
-    }
-
-    return <div> {result} </div>;
+  for (let i = byDateItemList.length - 1; i >= 0; i--) {
+    result.push(
+      <div key={i}>
+        <p className={Styles.headerTime}>
+          {" "}
+          {convertNormalFormatDate(byDateItemList[i].Date)}{" "}
+        </p>{" "}
+        <ByDateItem
+          item={byDateItemList[i]}
+          preItem={!i ? null : byDateItemList[i - 1]}
+          name={name}
+          setItemSideBarChoosen={setItemSideBarChoosen}
+        />{" "}
+      </div>
+    );
   }
+
+  return <div> {result} </div>;
 }
 
 function getInfoByPage(page, data) {
@@ -93,96 +89,91 @@ function getPages(amountItem) {
   );
 }
 
-class CountryInfo extends React.Component {
-  constructor(props) {
-    super(props);
+function CountryInfo(props) {
+  const {
+    location,
+    name,
+    match,
+    history,
+    hasShowOffSplashScreen,
+    setItemSideBarChoosen,
+    setVisibilitySplashScreen,
+  } = props;
 
-    this.countryName = !props.name
-      ? props.match.params.name
-      : props.name;
+  const currentPage = location.search
+    ? queryString.parse(location.search).page
+    : 1;
 
-    this.setPage = this.setPage.bind(this);
-    
-    const currentPage = props.location.search ? queryString.parse(props.location.search).page : 1;
-    
-    this.state = {
-      loading: true,
-      page: currentPage
-    };
-  }
+  const getCountryName = () => {
+    return !name ? match.params.name : name;
+  };
 
-  async getInfo() {
-    const url = config.api + "/dayone/country/" + this.countryName;
+  const [countryName] = useState(getCountryName());
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(currentPage);
+  const [maxPage, setMaxPage] = useState(0);
+  const [data, setData] = useState({});
 
-    if(window.navigator.onLine) {
-    await axios.get(url).then((response) => {
-      this.maxPage = getPages(response.data.length);
+  const getInfo = async () => {
+    const url = config.api + "/dayone/country/" + countryName;
 
-      this.data = response.data;
+    if (window.navigator.onLine) {
+      await axios.get(url).then((response) => {
+        setMaxPage(getPages(response.data.length));
 
-      localStorage.setItem('maxPage', this.maxPage);
-      localStorage.setItem('data', JSON.stringify(this.data));
-    });
-  } else {
-    this.maxPage = localStorage.getItem('maxPage');
-    this.data = JSON.parse(localStorage.getItem('data'));
-  }
+        setData(response.data);
 
-  this.setState({
-    loading: false,
-  });
-
-  this.props.setVisibilitySplashScreen();
-  }
-
-  setPage(page) {
-    if (page > 0 && page <= this.maxPage) {
-      this.props.history.push('/country/' + this.countryName + '?page=' + page);
-      this.setState({
-        page,
+        localStorage.setItem("maxPage", maxPage);
+        localStorage.setItem("data", JSON.stringify(data));
+      }).catch(error => {
+        console.log(error);
       });
+    } else {
+      setMaxPage(localStorage.getItem("maxPage"));
+      setData(JSON.parse(localStorage.getItem("data")));
     }
+
+    setLoading(false);
+
+    setVisibilitySplashScreen();
+  };
+
+  const setCurrentPage = (page) => {
+    if (page > 0 && page <= maxPage) {
+      history.push("/country/" + countryName + "?page=" + page);
+
+      setPage(page);
+    }
+  };
+
+  useEffect(() => {
+    getInfo();
+  }, []);
+
+  if (!hasShowOffSplashScreen) {
+    return <SplashScreen />;
   }
 
-  async componentDidMount() {
-    await this.getInfo();
+  if (loading) {
+    return <Loading />;
   }
 
-  render() {
-    if (!this.props.hasShowOffSplashScreen) {
-      return <SplashScreen />;
-    }
-
-    if (this.state.loading) {
-      return <Loading />;
-    }
-
-    return (
-      <div className="full-width">
-        <SideBar
-          itemSideBarChoosen={
-            this.countryName === "Vietnam" ? "Vietnam" : "World"
-          }
-        />
-        <div className={className(Styles.wrapper, "content")}>
-          <div className={Styles.header}>
-            {" "}
-            Information of {this.countryName}{" "}
-          </div>{" "}
-          <ByDateItemList
-            byDateItemList={getInfoByPage(this.state.page, this.data)}
-            name={this.props.name}
-            setItemSideBarChoosen={this.props.setItemSideBarChoosen}
-          />{" "}
-          <Pagination
-            setPage={this.setPage}
-            page={this.state.page}
-            maxPage={this.maxPage}
-          />
-        </div>
+  return (
+    <div className="full-width">
+      <SideBar
+        itemSideBarChoosen={countryName === "Vietnam" ? "Vietnam" : "World"}
+      />
+      <div className={className(Styles.wrapper, "content")}>
+        <div className={Styles.header}> Information of {countryName} </div>{" "}
+        <ByDateItemList
+          byDateItemList={getInfoByPage(page, data)}
+          name={name}
+          setItemSideBarChoosen={setItemSideBarChoosen}
+        />{" "}
+        <Pagination setPage={setCurrentPage} page={page} maxPage={maxPage} />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default withRouter(CountryInfo);
