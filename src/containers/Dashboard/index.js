@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import Styles from "./Dashboard.module.css";
 
 import Pagination from "../../components/Pagination";
-import HocPagination from "../../components/HocPagination";
+import usePaginationData from "../../components/usePaginationData";
 
 const ITEM_PER_PAGE = 15;
 const DEFAULT_URL = "/world";
@@ -40,15 +40,23 @@ function Dashboard(props) {
   const [summaryGlobalInfo, setSummaryGlobalInfo] = useState({});
   const [summaryCountries, setSummaryCountries] = useState({});
 
+
+  const {
+    currentPageData,
+    page,
+    setPage,
+    setData,
+    maxPage
+  } = usePaginationData(ITEM_PER_PAGE, DEFAULT_URL);
+
   const getInfo = async () => {
     const url = config.api + "/summary";
     if (window.navigator.onLine) {
       await axios.get(url).then((response) => {
         setSummaryGlobalInfo(response.data.Global);
         setSummaryCountries(response.data.Countries);
-        console.log("summaryGlobalInfo: ", summaryGlobalInfo);
-        console.log("data: ", summaryCountries);
-        props.setData(response.data.Countries.reverse());
+
+        setData(response.data.Countries.reverse());
 
         setLoading(false);
         props.setVisibilitySplashScreen();
@@ -65,7 +73,10 @@ function Dashboard(props) {
     } else {
       setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryGlobalInfo")));
       setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryCountries")));
+
+      setData(summaryCountries.reverse());
     }
+
   };
 
   useEffect(() => {
@@ -86,16 +97,16 @@ function Dashboard(props) {
       <div className={className(Styles.wrapper, "content")}>
         <InfoByCard cases={summaryGlobalInfo} />{" "}
         <div className={Styles.countryItemWrapper}>
-          <CountryItemList countryItemList={props.dataCurrentPage} />{" "}
+          <CountryItemList countryItemList={currentPageData} />{" "}
         </div>{" "}
         <Pagination
-          setPage={props.setPage}
-          page={props.page}
-          maxPage={props.maxPage}
+          page={page}
+          setPage={setPage}
+          maxPage={maxPage}
         />{" "}
       </div>{" "}
     </div>
   );
 }
 
-export default HocPagination(Dashboard, ITEM_PER_PAGE, DEFAULT_URL);
+export default Dashboard;

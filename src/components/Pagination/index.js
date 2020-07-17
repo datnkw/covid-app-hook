@@ -46,7 +46,7 @@ function BlankBtn(props) {
 
 function NumberBtn(props) {
   const { page, setPage, currentPage } = props;
-
+  console.log("number page: ", page);
   return (
     <div
       className={classNames(
@@ -65,6 +65,8 @@ function Pagination(props) {
   const [valueBtn, dispatchValueBtn] = useReducer(valueBtnReducer, [0, 0, 0, 0, 0]);
 
   const { page, maxPage, setPage } = props;
+
+  console.log("current page: ", page);
 
   useEffect(() => {
     dispatchValueBtn({
