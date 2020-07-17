@@ -71,7 +71,6 @@ const AuthBtn = (props) => {
 };
 
 function SideBar(props) {
-  const [authentication, setAuthentication] = useState({});
   const [isHiddenSideBar, setIsHiddenSideBar] = useState(true);
 
   const location = useLocation();
