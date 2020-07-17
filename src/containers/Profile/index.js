@@ -6,7 +6,7 @@ import SideBar from "../../components/SideBar";
 import className from "classnames";
 import SplashScreen from "../../components/SplashScreen";
 import { UserContext } from "../../utils/UserContext";
-import { withRouter } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -57,6 +57,9 @@ function Profile(props) {
   const [info, setInfo] = useReducer(reducer, initialInfo);
   const [db] = useState(Firebase.firestore());
 
+  const history = useHistory();
+  const location = useLocation();
+
   const handleChange = (event) => {
     const target = event.target;
     setInfo({
@@ -83,9 +86,9 @@ function Profile(props) {
 
   useEffect(() => {
     if (!UserContextInstance.authentication.isLogin) {
-      props.history.push({
+      history.push({
         pathname: "/login",
-        state: { from: props.location.pathname },
+        state: { from: location.pathname },
       });
       return;
     }
@@ -153,4 +156,4 @@ function Profile(props) {
   );
 }
 
-export default withRouter(Profile);
+export default Profile;

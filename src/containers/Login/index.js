@@ -4,18 +4,15 @@ import StyleSplashScreen from "../../components/SplashScreen/SplashScreen.module
 import className from "classnames";
 import Firebase from "../../utils/Firebase";
 import { UserContext } from "../../utils/UserContext";
-import { withRouter } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const UserContextInstance = useContext(UserContext);
-
-  const {
-    location,
-    history
-  } = props;
+  const history = useHistory();
+  const location = useLocation();
 
   const login = async (event) => {
     event.preventDefault();
@@ -71,4 +68,4 @@ function Login(props) {
   
 }
 
-export default withRouter(Login);
+export default Login;

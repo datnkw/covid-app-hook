@@ -7,7 +7,7 @@ import SplashScreen from "../../components/SplashScreen";
 import Pagination from "../../components/Pagination";
 import SideBar from "../../components/SideBar";
 import className from "classnames";
-import { withRouter } from "react-router-dom";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import Styles from "./CountryInfo.module.css";
 import queryString from "query-string";
 
@@ -92,11 +92,12 @@ function getPages(amountItem) {
 }
 
 function CountryInfo(props) {
+  const location = useLocation();
+  const history = useHistory();
+  const match = useRouteMatch();
+
   const {
-    location,
     name,
-    match,
-    history,
     hasShowOffSplashScreen,
     setItemSideBarChoosen,
     setVisibilitySplashScreen,
@@ -179,4 +180,4 @@ function CountryInfo(props) {
   );
 }
 
-export default withRouter(CountryInfo);
+export default CountryInfo;

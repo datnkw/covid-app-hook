@@ -1,47 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Styles from "./SideBar.module.css";
 import { UserContext } from "../../utils/UserContext";
-import { withRouter } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import firebase from "../../utils/Firebase";
 import className from "classnames";
 
-class SideBarItem extends React.Component {
-  render() {
-    const {info, itemSideBarChoosen} = this.props;
-    return (
-      <Link to={info.to}>
-        <div
-          className={className(Styles.sideBarItem, {
-            [Styles.clicked]: itemSideBarChoosen === info.name,
-          })}
-        >
-          {info.name}
-        </div>
-      </Link>
-    );
-  }
+function SideBarItem(props) {
+  const { info, itemSideBarChoosen } = props;
+  return (
+    <Link to={info.to}>
+      <div
+        className={className(Styles.sideBarItem, {
+          [Styles.clicked]: itemSideBarChoosen === info.name,
+        })}
+      >
+        {info.name}
+      </div>
+    </Link>
+  );
 }
 
-class ItemSideBarList extends React.Component {
-  render() {
-    const { itemLists, itemSideBarChoosen } = this.props;
-    return itemLists
-      ? itemLists.map((item) => (
-          <SideBarItem
-            key={item.name ? item.name : ""}
-            info={item}
-            itemSideBarChoosen={itemSideBarChoosen}
-          />
-        ))
-      : null;
-  }
+function ItemSideBarList(props) {
+  const { itemLists, itemSideBarChoosen } = props;
+  return itemLists
+    ? itemLists.map((item) => (
+        <SideBarItem
+          key={item.name ? item.name : ""}
+          info={item}
+          itemSideBarChoosen={itemSideBarChoosen}
+        />
+      ))
+    : null;
 }
 
 const AuthBtn = (props) => {
   return (
     <UserContext.Consumer>
-      {({authentication, logout}) => {
+      {({ authentication, logout }) => {
         return (
           <div className={Styles.authWrapper}>
             <div
@@ -62,85 +58,86 @@ const AuthBtn = (props) => {
               )}
             >
               <p> {authentication.email} </p>{" "}
-              <div className={Styles.authBtn} onClick={logout}> Logout </div>{" "}
+              <div className={Styles.authBtn} onClick={logout}>
+                {" "}
+                Logout{" "}
+              </div>{" "}
             </div>{" "}
           </div>
         );
       }}
     </UserContext.Consumer>
   );
-}
+};
 
-class SideBar extends React.Component {
-  constructor(props) {
-    super(props);
+function SideBar(props) {
+  const [isHiddenSideBar, setIsHiddenSideBar] = useState(true);
 
-    this.state = {
-      authentication: {},
-      isHiddenSideBar: true
-    };
-  }
+  const location = useLocation();
+  const history = useHistory();
 
-  doTheLogout = (logout) => {
-    
-    firebase.auth().signOut().catch(function(error) {
-    });
+
+  const doTheLogout = (logout) => {
+    firebase
+      .auth()
+      .signOut()
+      .catch(function (error) {
+        alert("Log out failed");
+      });
     logout();
-  }
-  
-  goToLogin = () => {
-    this.props.history.push({
-      pathname: '/login',
-      state: { from: this.props.location.pathname }
+  };
+
+  const goToLogin = () => {
+
+    history.push({
+      pathname: "/login",
+      state: { from: location.pathname },
     });
   };
 
-  switchSideBar = () => {
-    this.setState({
-      isHiddenSideBar: !this.state.isHiddenSideBar
-    })
-    
-  }
+  const switchSideBar = () => {
+    setIsHiddenSideBar(!isHiddenSideBar);
+  };
 
-  render() {
-    const itemSideBarInfoList = [
-      {
-        name: "Vietnam",
-        to: "/",
-      },
-      {
-        name: "World",
-        to: "/world",
-      },
-      {
-        name: "Profile",
-        to: "/profile",
-      },
-    ];
+  const itemSideBarInfoList = [
+    {
+      name: "Vietnam",
+      to: "/",
+    },
+    {
+      name: "World",
+      to: "/world",
+    },
+    {
+      name: "Profile",
+      to: "/profile",
+    },
+  ];
 
-    return (
-      <div className={className(
+  return (
+    <div
+      className={className(
         Styles.sideBarWrapper,
-        this.state.isHiddenSideBar ? Styles.hiddenSidebar : ''
-      )}>
-        <div className={Styles.logoWrapper}>
-          <div className={Styles.logo}> </div> <p> Covid - 19 app </p>{" "}
-        </div>
-        <ItemSideBarList
-          itemLists={itemSideBarInfoList}
-          itemSideBarChoosen={this.props.itemSideBarChoosen}
-        />
-
-        <AuthBtn goToLogin={this.goToLogin} doTheLogout={this.doTheLogout}/>
-
-        <button className={Styles.menuBtnWrapper} onClick={this.switchSideBar}>
-          <div className={Styles.menuBtn}></div>
-          <div className={Styles.menuBtn}></div>
-          <div className={Styles.menuBtn}></div>
-        </button>
+        isHiddenSideBar ? Styles.hiddenSidebar : ""
+      )}
+    >
+      <div className={Styles.logoWrapper}>
+        <div className={Styles.logo}> </div> <p> Covid - 19 app </p>{" "}
       </div>
-    );
-  }
+      <ItemSideBarList
+        itemLists={itemSideBarInfoList}
+        itemSideBarChoosen={props.itemSideBarChoosen}
+      />
+
+      <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} />
+
+      <button className={Styles.menuBtnWrapper} onClick={switchSideBar}>
+        <div className={Styles.menuBtn}></div>
+        <div className={Styles.menuBtn}></div>
+        <div className={Styles.menuBtn}></div>
+      </button>
+    </div>
+  );
 }
 
-export default withRouter(SideBar);
+export default SideBar;
