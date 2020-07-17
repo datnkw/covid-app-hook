@@ -1,52 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import Styles from "./NotiOffline.module.css";
 
-class NotiOffline extends React.Component {
-  constructor(props) {
-    super(props);
+function NotiOffline() {
+  const [isDisconnect, setIsDisconnect] = useState(false);
+  const [timer, setTimer] = useState();
 
-    this.state = {
-      isDisconnect: false,
-    };
+  useEffect(() => {
+    setTimer(setInterval(() => checkConnect()));
 
-    this.checkConnect = this.checkConnect.bind(this);
-  }
+    return () => {
+      clearInterval(timer);
+    }
+  }, []);
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.checkConnect());
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
-
-  checkConnect() {
-    const { isDisconnect } = this.state;
+  const checkConnect = () => {
     const isOnline = window.navigator.onLine;
-    if (!isOnline && !isDisconnect) {
-      this.setState({
-        isDisconnect: true,
-      });
-    } else if (isOnline && isDisconnect) {
-      this.setState({
-        isDisconnect: false,
-      });
+    if (!isOnline) {
+      setIsDisconnect(true);
+    } else if (isOnline) {
+      setIsDisconnect(false);
     }
   }
 
-  render() {
     return (
       <div
         className={classNames(
           Styles.warning,
-          this.state.isDisconnect ? Styles.disconnect : null
+          isDisconnect ? Styles.disconnect : null
         )}
       >
         Internet connection lost
       </div>
     );
-  }
 }
 
 export default NotiOffline;
