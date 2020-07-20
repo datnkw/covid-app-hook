@@ -103,21 +103,12 @@ function CountryInfo(props) {
     setVisibilitySplashScreen,
   } = props;
 
-  // const currentPage = location.search
-  //   ? queryString.parse(location.search).page
-  //   : 1;
-
-
   const getCountryName = () => {
     return !name ? match.params.name : name;
   };
 
   const countryName = getCountryName();
   const [loading, setLoading] = useState(true);
-  // const [page, setPage] = useState(currentPage);
-  // const [maxPage, setMaxPage] = useState(0);
-  // const [data, setData] = useState({});
-
 
   const {
     currentPageData,
@@ -127,23 +118,49 @@ function CountryInfo(props) {
     maxPage
   } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
 
-  const getInfo = async () => {
+  const getTimeByMinute = (minute) => {
+    return Date.now()/1000 - minute * 60;
+  }
+
+  const isNeededToReloadData = () => {
+    const prevGetDataTime = localStorage.getItem("prevGetDataCountryTime");
+
+    if(!prevGetDataTime || prevGetDataTime < getTimeByMinute(1)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if (window.navigator.onLine) {
-      await axios.get(url).then((response) => {
-        setData(response.data);
+    if (window.navigator.onLine && isNeededToReloadData()) {
+      return await axios.get(url).then((response) => {
+        const data = response.data;
 
         localStorage.setItem("maxPage", maxPage);
-        localStorage.setItem("data", JSON.stringify(response.data));
+        localStorage.setItem("data", JSON.stringify(data));
+        localStorage.setItem(
+          "prevGetDataCountryTime",
+          Date.now()/1000
+        )
+
+        return data;
       }).catch(error => {
         console.log("error get info country");
         console.log(error);
+
+        return [];
       });
     } else {
-      setData(JSON.parse(localStorage.getItem("data")));
+      return JSON.parse(localStorage.getItem("data"))
     }
+  }
 
+  const getInfo = async () => {
+    const dataCountry = await fetchData();
+    setData(dataCountry);
     setLoading(false);
     setVisibilitySplashScreen();
   };

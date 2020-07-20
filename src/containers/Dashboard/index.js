@@ -40,7 +40,7 @@ function CountryItemList(props) {
 function Dashboard(props) {
   const [loading, setLoading] = useState(true);
   const [summaryGlobalInfo, setSummaryGlobalInfo] = useState({});
-  const [summaryCountries, setSummaryCountries] = useState([]);
+  //const [summaryCountries, setSummaryCountries] = useState([]);
 
   const {
     currentPageData,
@@ -57,7 +57,7 @@ function Dashboard(props) {
   const isNeededToReloadData = () => {
     const prevGetDataTime = localStorage.getItem("prevGetDataTime");
 
-    if(!prevGetDataTime || prevGetDataTime < getTimeByMinute(0.1)) {
+    if(!prevGetDataTime || prevGetDataTime < getTimeByMinute(1)) {
       return true;
     }
 
@@ -71,7 +71,7 @@ function Dashboard(props) {
       return axios.get(url).then((response) => {
         const dataCountries = response.data.Countries;
         setSummaryGlobalInfo(response.data.Global);
-        setSummaryCountries(dataCountries);
+        //setSummaryCountries(dataCountries);
 
         localStorage.setItem(
           "summaryGlobalInfo",
@@ -93,9 +93,9 @@ function Dashboard(props) {
         JSON.parse(localStorage.getItem("summaryGlobalInfo"))
       );
       const dataCountries = JSON.parse(localStorage.getItem("summaryCountries"));
-      setSummaryCountries(
-        dataCountries
-      );
+      // setSummaryCountries(
+      //   dataCountries
+      // );
 
       return dataCountries;
     }
