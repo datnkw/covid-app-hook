@@ -7,9 +7,11 @@ import SplashScreen from "../../components/SplashScreen";
 import Pagination from "../../components/Pagination";
 import SideBar from "../../components/SideBar";
 import className from "classnames";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
+import isNeededToReloadData from "../../utils/checkNessaryLoadData";
+
 
 const ITEM_PER_PAGE = 5;
 
@@ -72,28 +74,7 @@ function ByDateItemList(props) {
   return <div> {result} </div>;
 }
 
-function getInfoByPage(page, data) {
-  const positionFirstItem = data.length - page * ITEM_PER_PAGE;
-
-  console.log("data length: ", data.length);
-
-  if (positionFirstItem >= 0) {
-    return data.slice(positionFirstItem, positionFirstItem + ITEM_PER_PAGE);
-  } else {
-    return data.slice(0, ITEM_PER_PAGE + positionFirstItem);
-  }
-}
-
-function getPages(amountItem) {
-  return (
-    Math.floor(amountItem / ITEM_PER_PAGE) +
-    (amountItem % ITEM_PER_PAGE === 0 ? 0 : 1)
-  );
-}
-
 function CountryInfo(props) {
-  const location = useLocation();
-  const history = useHistory();
   const match = useRouteMatch();
 
   const {
@@ -103,21 +84,12 @@ function CountryInfo(props) {
     setVisibilitySplashScreen,
   } = props;
 
-  // const currentPage = location.search
-  //   ? queryString.parse(location.search).page
-  //   : 1;
-
-
   const getCountryName = () => {
     return !name ? match.params.name : name;
   };
 
   const countryName = getCountryName();
   const [loading, setLoading] = useState(true);
-  // const [page, setPage] = useState(currentPage);
-  // const [maxPage, setMaxPage] = useState(0);
-  // const [data, setData] = useState({});
-
 
   const {
     currentPageData,
@@ -127,23 +99,40 @@ function CountryInfo(props) {
     maxPage
   } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
 
-  const getInfo = async () => {
+  const isSameCountryName = (countryName) => {
+    return countryName === localStorage.getItem("country");
+  }
+
+  const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if (window.navigator.onLine) {
-      await axios.get(url).then((response) => {
-        setData(response.data);
+    if ((window.navigator.onLine && isNeededToReloadData("prevGetDataCountryTime")) || !isSameCountryName(countryName)) {
+      return await axios.get(url).then((response) => {
+        const data = response.data;
 
         localStorage.setItem("maxPage", maxPage);
-        localStorage.setItem("data", JSON.stringify(response.data));
+        localStorage.setItem("data", JSON.stringify(data));
+        localStorage.setItem(
+          "prevGetDataCountryTime",
+          Date.now()/1000
+        )
+        localStorage.setItem("country", countryName)
+
+        return data;
       }).catch(error => {
         console.log("error get info country");
         console.log(error);
+
+        return [];
       });
     } else {
-      setData(JSON.parse(localStorage.getItem("data")));
+      return JSON.parse(localStorage.getItem("data"))
     }
+  }
 
+  const getInfo = async () => {
+    const dataCountry = await fetchData();
+    setData(dataCountry);
     setLoading(false);
     setVisibilitySplashScreen();
   };

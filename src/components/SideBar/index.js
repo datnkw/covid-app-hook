@@ -70,7 +70,9 @@ const AuthBtn = (props) => {
   );
 };
 
-function SideBar(props) {
+function SideBar({
+  itemSideBarChoosen
+}) {
   const [isHiddenSideBar, setIsHiddenSideBar] = useState(true);
 
   const location = useLocation();
@@ -126,7 +128,7 @@ function SideBar(props) {
       </div>
       <ItemSideBarList
         itemLists={itemSideBarInfoList}
-        itemSideBarChoosen={props.itemSideBarChoosen}
+        itemSideBarChoosen={itemSideBarChoosen}
       />
 
       <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} />

@@ -20,18 +20,15 @@ function usePaginationData(itemPerPage, defaultURL) {
     const positionFirstItem = data.length - page * itemPerPage;
     let result = [];
 
-    
+  
     try {
       if (positionFirstItem >= 0) {
         result = [...data.slice(positionFirstItem, positionFirstItem + itemPerPage)];
-        //return data.slice(positionFirstItem, positionFirstItem + itemPerPage);
       } else {
-        result = [...data.slice(0, itemPerPage + positionFirstItem)]
-        //return data.slice(0, itemPerPage + positionFirstItem);
+        result = [...data.slice(0, itemPerPage)]
       }
     } catch {
       result = [];
-      //return [];
     }
 
     console.log("currentPageData: ", result);
