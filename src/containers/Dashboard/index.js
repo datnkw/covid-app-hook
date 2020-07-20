@@ -9,6 +9,8 @@ import className from "classnames";
 import { Link } from "react-router-dom";
 import Styles from "./Dashboard.module.css";
 
+import _ from "lodash";
+
 import Pagination from "../../components/Pagination";
 import usePaginationData from "../../components/usePaginationData";
 
@@ -38,45 +40,74 @@ function CountryItemList(props) {
 function Dashboard(props) {
   const [loading, setLoading] = useState(true);
   const [summaryGlobalInfo, setSummaryGlobalInfo] = useState({});
-  const [summaryCountries, setSummaryCountries] = useState({});
-
+  const [summaryCountries, setSummaryCountries] = useState([]);
 
   const {
     currentPageData,
     page,
     setPage,
     setData,
-    maxPage
+    maxPage,
   } = usePaginationData(ITEM_PER_PAGE, DEFAULT_URL);
 
-  const getInfo = async () => {
+  const getTimeByMinute = (minute) => {
+    return Date.now()/1000 - minute * 60;
+  }
+
+  const isNeededToReloadData = () => {
+    const prevGetDataTime = localStorage.getItem("prevGetDataTime");
+
+    if(!prevGetDataTime || prevGetDataTime < getTimeByMinute(0.1)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  const fetchData = async () => {
     const url = config.api + "/summary";
-    if (window.navigator.onLine) {
-      await axios.get(url).then((response) => {
+    const isOnline = window.navigator.onLine;
+    if (isOnline && isNeededToReloadData()) {
+      return axios.get(url).then((response) => {
+        const dataCountries = response.data.Countries;
         setSummaryGlobalInfo(response.data.Global);
-        setSummaryCountries(response.data.Countries);
-
-        setData(response.data.Countries.reverse());
-
-        setLoading(false);
-        props.setVisibilitySplashScreen();
+        setSummaryCountries(dataCountries);
 
         localStorage.setItem(
           "summaryGlobalInfo",
-          JSON.stringify(summaryGlobalInfo)
+          JSON.stringify(response.data.Global)
         );
         localStorage.setItem(
           "summaryCountries",
-          JSON.stringify(summaryCountries)
+          JSON.stringify(dataCountries)
         );
+        localStorage.setItem(
+          "prevGetDataTime",
+          Date.now()/1000
+        )
+
+        return dataCountries;
       });
     } else {
-      setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryGlobalInfo")));
-      setSummaryGlobalInfo(JSON.parse(localStorage.getItem("summaryCountries")));
+      setSummaryGlobalInfo(
+        JSON.parse(localStorage.getItem("summaryGlobalInfo"))
+      );
+      const dataCountries = JSON.parse(localStorage.getItem("summaryCountries"));
+      setSummaryCountries(
+        dataCountries
+      );
 
-      setData(summaryCountries.reverse());
+      return dataCountries;
     }
+  }
 
+  const getInfo = async () => {
+    const dataCountries = await fetchData();
+    
+    setData(dataCountries.reverse());
+    setLoading(false);
+
+    props.setVisibilitySplashScreen();
   };
 
   useEffect(() => {
@@ -99,11 +130,7 @@ function Dashboard(props) {
         <div className={Styles.countryItemWrapper}>
           <CountryItemList countryItemList={currentPageData} />{" "}
         </div>{" "}
-        <Pagination
-          page={page}
-          setPage={setPage}
-          maxPage={maxPage}
-        />{" "}
+        <Pagination page={page} setPage={setPage} maxPage={maxPage} />{" "}
       </div>{" "}
     </div>
   );

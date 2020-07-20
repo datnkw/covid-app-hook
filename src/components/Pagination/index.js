@@ -46,13 +46,13 @@ function BlankBtn(props) {
 
 function NumberBtn(props) {
   const { page, setPage, currentPage } = props;
-  console.log("number page: ", page);
+  
   return (
     <div
       className={classNames(
         Styles.btnPagination,
         page ? "" : Styles.hiddenBtn,
-        currentPage === page ? Styles.choosenPage : ""
+        parseInt(currentPage) === page ? Styles.choosenPage : ""
       )}
       onClick={() => setPage(page)}
     >

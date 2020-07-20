@@ -8,8 +8,8 @@ import Pagination from "../../components/Pagination";
 import SideBar from "../../components/SideBar";
 import className from "classnames";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
-import queryString from "query-string";
 
 const ITEM_PER_PAGE = 5;
 
@@ -103,51 +103,49 @@ function CountryInfo(props) {
     setVisibilitySplashScreen,
   } = props;
 
-  const currentPage = location.search
-    ? queryString.parse(location.search).page
-    : 1;
+  // const currentPage = location.search
+  //   ? queryString.parse(location.search).page
+  //   : 1;
+
 
   const getCountryName = () => {
     return !name ? match.params.name : name;
   };
 
-  const [countryName] = useState(getCountryName());
+  const countryName = getCountryName();
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(currentPage);
-  const [maxPage, setMaxPage] = useState(0);
-  const [data, setData] = useState({});
+  // const [page, setPage] = useState(currentPage);
+  // const [maxPage, setMaxPage] = useState(0);
+  // const [data, setData] = useState({});
+
+
+  const {
+    currentPageData,
+    page,
+    setPage,
+    setData,
+    maxPage
+  } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
 
   const getInfo = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
     if (window.navigator.onLine) {
       await axios.get(url).then((response) => {
-        setMaxPage(getPages(response.data.length));
-
         setData(response.data);
 
         localStorage.setItem("maxPage", maxPage);
-        localStorage.setItem("data", JSON.stringify(data));
+        localStorage.setItem("data", JSON.stringify(response.data));
       }).catch(error => {
         console.log("error get info country");
         console.log(error);
       });
     } else {
-      setMaxPage(localStorage.getItem("maxPage"));
       setData(JSON.parse(localStorage.getItem("data")));
     }
 
     setLoading(false);
-
     setVisibilitySplashScreen();
-  };
-
-  const setCurrentPage = (page) => {
-    if (page > 0 && page <= maxPage) {
-      history.push("/country/" + countryName + "?page=" + page);
-
-      setPage(page);
-    }
   };
 
   useEffect(() => {
@@ -170,11 +168,11 @@ function CountryInfo(props) {
       <div className={className(Styles.wrapper, "content")}>
         <div className={Styles.header}> Information of {countryName} </div>{" "}
         <ByDateItemList
-          byDateItemList={getInfoByPage(page, data)}
+          byDateItemList={currentPageData}
           name={name}
           setItemSideBarChoosen={setItemSideBarChoosen}
         />{" "}
-        <Pagination setPage={setCurrentPage} page={page} maxPage={maxPage} />
+        <Pagination setPage={setPage} page={page} maxPage={maxPage} />
       </div>
     </div>
   );
