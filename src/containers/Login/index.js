@@ -6,7 +6,7 @@ import Firebase from "../../utils/Firebase";
 import { UserContext } from "../../utils/UserContext";
 import { useHistory, useLocation } from "react-router-dom";
 
-function Login(props) {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

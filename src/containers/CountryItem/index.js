@@ -10,6 +10,8 @@ import className from "classnames";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
+import isNeededToReloadData from "../../utils/checkNessaryLoadData";
+
 
 const ITEM_PER_PAGE = 5;
 
@@ -72,28 +74,7 @@ function ByDateItemList(props) {
   return <div> {result} </div>;
 }
 
-function getInfoByPage(page, data) {
-  const positionFirstItem = data.length - page * ITEM_PER_PAGE;
-
-  console.log("data length: ", data.length);
-
-  if (positionFirstItem >= 0) {
-    return data.slice(positionFirstItem, positionFirstItem + ITEM_PER_PAGE);
-  } else {
-    return data.slice(0, ITEM_PER_PAGE + positionFirstItem);
-  }
-}
-
-function getPages(amountItem) {
-  return (
-    Math.floor(amountItem / ITEM_PER_PAGE) +
-    (amountItem % ITEM_PER_PAGE === 0 ? 0 : 1)
-  );
-}
-
 function CountryInfo(props) {
-  const location = useLocation();
-  const history = useHistory();
   const match = useRouteMatch();
 
   const {
@@ -118,24 +99,10 @@ function CountryInfo(props) {
     maxPage
   } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
 
-  const getTimeByMinute = (minute) => {
-    return Date.now()/1000 - minute * 60;
-  }
-
-  const isNeededToReloadData = () => {
-    const prevGetDataTime = localStorage.getItem("prevGetDataCountryTime");
-
-    if(!prevGetDataTime || prevGetDataTime < getTimeByMinute(1)) {
-      return true;
-    }
-
-    return false;
-  }
-
   const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if (window.navigator.onLine && isNeededToReloadData()) {
+    if (window.navigator.onLine && isNeededToReloadData("prevGetDataCountryTime")) {
       return await axios.get(url).then((response) => {
         const data = response.data;
 
