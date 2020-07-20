@@ -7,7 +7,7 @@ import SplashScreen from "../../components/SplashScreen";
 import Pagination from "../../components/Pagination";
 import SideBar from "../../components/SideBar";
 import className from "classnames";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
 import isNeededToReloadData from "../../utils/checkNessaryLoadData";
@@ -99,10 +99,14 @@ function CountryInfo(props) {
     maxPage
   } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
 
+  const isSameCountryName = (countryName) => {
+    return countryName === localStorage.getItem("country");
+  }
+
   const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if (window.navigator.onLine && isNeededToReloadData("prevGetDataCountryTime")) {
+    if ((window.navigator.onLine && isNeededToReloadData("prevGetDataCountryTime")) || !isSameCountryName(countryName)) {
       return await axios.get(url).then((response) => {
         const data = response.data;
 
@@ -112,6 +116,7 @@ function CountryInfo(props) {
           "prevGetDataCountryTime",
           Date.now()/1000
         )
+        localStorage.setItem("country", countryName)
 
         return data;
       }).catch(error => {

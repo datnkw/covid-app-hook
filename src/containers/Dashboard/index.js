@@ -34,6 +34,8 @@ function CountryItem(props) {
 function CountryItemList({
   countryItemList
 }) {
+  const countryItemReverseList = countryItemList.reverse();
+
   return countryItemReverseList
     ? countryItemReverseList.map((item) => <CountryItem key={item.Slug} info={item} />)
     : null;
