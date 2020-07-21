@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import Styles from "./Pagination.module.css";
 
@@ -10,12 +10,7 @@ function isVisibleRightBlank(page, maxPage) {
   return page < maxPage - 2;
 }
 
-function valueBtnReducer(state, action) {
-  const { page, maxPage } = action;
-
-  console.log("page: ", page);
-  console.log("maxPage: ", maxPage);
-
+function calcValueBtn(page, maxPage) {
   if (page < 3) {
     return [2, 3, 0, 0, +maxPage - 1];
   } else if (page === 3) {
@@ -62,17 +57,14 @@ function NumberBtn(props) {
 }
 
 function Pagination(props) {
-  const [valueBtn, dispatchValueBtn] = useReducer(valueBtnReducer, [0, 0, 0, 0, 0]);
+  const [valueBtn, setValueBtn] = useState([0, 0, 0, 0, 0]);
 
   const { page, maxPage, setPage } = props;
 
   console.log("current page: ", page);
 
   useEffect(() => {
-    dispatchValueBtn({
-      page,
-      maxPage,
-    });
+    setValueBtn(calcValueBtn(page, maxPage));
   }, [page]);
 
   return (

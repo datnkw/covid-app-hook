@@ -20,7 +20,6 @@ function usePaginationData(itemPerPage, defaultURL) {
     const positionFirstItem = data.length - page * itemPerPage;
     let result = [];
 
-  
     try {
       if (positionFirstItem >= 0) {
         result = [...data.slice(positionFirstItem, positionFirstItem + itemPerPage)];
@@ -30,8 +29,6 @@ function usePaginationData(itemPerPage, defaultURL) {
     } catch {
       result = [];
     }
-
-    console.log("currentPageData: ", result);
 
     return result;
   };
