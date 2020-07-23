@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Styles from "./SideBar.module.css";
-import { UserContext } from "../../utils/UserContext";
+import { useSelector, useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import firebase from "../../utils/Firebase";
 import className from "classnames";
+import { logout } from "../../redux/actions";
 
 function SideBarItem(props) {
   const { info, itemSideBarChoosen } = props;
@@ -35,9 +36,9 @@ function ItemSideBarList(props) {
 }
 
 const AuthBtn = (props) => {
-  return (
-    <UserContext.Consumer>
-      {({ authentication, logout }) => {
+  const authentication = useSelector(state => state.auth);
+  const dispatch = useDispatch();
+
         return (
           <div className={Styles.authWrapper}>
             <div
@@ -58,16 +59,14 @@ const AuthBtn = (props) => {
               )}
             >
               <p> {authentication.email} </p>{" "}
-              <div className={Styles.authBtn} onClick={logout}>
+              <div className={Styles.authBtn} onClick={() => dispatch(logout())}>
                 {" "}
                 Logout{" "}
               </div>{" "}
             </div>{" "}
           </div>
         );
-      }}
-    </UserContext.Consumer>
-  );
+
 };
 
 function SideBar({
@@ -115,6 +114,8 @@ function SideBar({
       to: "/profile",
     },
   ];
+
+
 
   return (
     <div

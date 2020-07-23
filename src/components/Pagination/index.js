@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import Styles from "./Pagination.module.css";
 
-function isVisibleLeftBlank(page, maxPage) {
+function isVisibleLeftBlank(page) {
   return page > 3;
 }
 
@@ -10,7 +10,7 @@ function isVisibleRightBlank(page, maxPage) {
   return page < maxPage - 2;
 }
 
-function calcValueBtn(page, maxPage) {
+function calcPageNumberBtn(page, maxPage) {
   if (page < 3) {
     return [2, 3, 0, 0, +maxPage - 1];
   } else if (page === 3) {
@@ -64,7 +64,7 @@ function Pagination(props) {
   console.log("current page: ", page);
 
   useEffect(() => {
-    setValueBtn(calcValueBtn(page, maxPage));
+    setValueBtn(calcPageNumberBtn(page, maxPage));
   }, [page]);
 
   return (

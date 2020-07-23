@@ -1,20 +1,25 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Styles from "./Login.module.css";
 import StyleSplashScreen from "../../components/SplashScreen/SplashScreen.module.css";
 import className from "classnames";
 import Firebase from "../../utils/Firebase";
-import { UserContext } from "../../utils/UserContext";
 import { useHistory, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/actions";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const UserContextInstance = useContext(UserContext);
+  //const UserContextInstance = useContext(UserContext);
   const history = useHistory();
   const location = useLocation();
 
-  const login = async (event) => {
+  const dispatch = useDispatch();
+
+  const handleLogin = async (event) => {
+    //console.log("event: ", event);
+
     event.preventDefault();
 
     if (!window.navigator.onLine) {
@@ -29,20 +34,25 @@ function Login() {
         return;
       });
 
-    await Firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        UserContextInstance.login(user.email, user.uid);
-        history.push(
-          location.state ? location.state.from : "/"
-        );
-      }
-    });
+
+          await Firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              dispatch(login(
+                {
+                  email: user.email, 
+                  id: user.uid
+                }));
+              history.push(
+                location.state ? location.state.from : "/"
+              );
+            }
+          });
   }
 
     return (
       <div className={Styles.wrapper}>
         <div className={className(StyleSplashScreen.logo, Styles.logo)}></div>
-        <form onSubmit={login} method="post">
+        <form onSubmit={handleLogin} method="post">
           <div className={Styles.inputWrapper}>
             <p>email:</p>
             <input
