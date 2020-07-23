@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Styles from "./SideBar.module.css";
-import { useSelector, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import firebase from "../../utils/Firebase";
 import className from "classnames";
@@ -36,15 +36,14 @@ function ItemSideBarList(props) {
 }
 
 const AuthBtn = (props) => {
-  const authentication = useSelector(state => state.auth);
-  const dispatch = useDispatch();
+
 
         return (
           <div className={Styles.authWrapper}>
             <div
               className={className(
                 Styles.btnHolder,
-                authentication.isLogin ? "hidden" : ""
+                props.auth.isLogin ? "hidden" : ""
               )}
             >
               <div className={Styles.authBtn} onClick={props.goToLogin}>
@@ -55,11 +54,11 @@ const AuthBtn = (props) => {
             <div
               className={className(
                 Styles.btnHolder,
-                authentication.isLogin ? "" : "hidden"
+                props.auth.isLogin ? "" : "hidden"
               )}
             >
-              <p> {authentication.email} </p>{" "}
-              <div className={Styles.authBtn} onClick={() => dispatch(logout())}>
+              <p> {props.auth.email} </p>{" "}
+              <div className={Styles.authBtn} onClick={() => props.doTheLogout()}>
                 {" "}
                 Logout{" "}
               </div>{" "}
@@ -69,8 +68,17 @@ const AuthBtn = (props) => {
 
 };
 
+const mapStateToProps = state => {
+  const { auth } = state;
+  return { auth };
+};
+
+
+
 function SideBar({
-  itemSideBarChoosen
+  itemSideBarChoosen,
+  auth,
+  logout
 }) {
   const [isHiddenSideBar, setIsHiddenSideBar] = useState(true);
 
@@ -78,7 +86,7 @@ function SideBar({
   const history = useHistory();
 
 
-  const doTheLogout = (logout) => {
+  const doTheLogout = () => {
     firebase
       .auth()
       .signOut()
@@ -132,7 +140,7 @@ function SideBar({
         itemSideBarChoosen={itemSideBarChoosen}
       />
 
-      <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} />
+      <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} auth={auth}/>
 
       <button className={Styles.menuBtnWrapper} onClick={switchSideBar}>
         <div className={Styles.menuBtn}></div>
@@ -143,4 +151,4 @@ function SideBar({
   );
 }
 
-export default SideBar;
+export default connect(mapStateToProps, {logout})(SideBar);
