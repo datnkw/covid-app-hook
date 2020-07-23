@@ -51,7 +51,7 @@ const initialInfo = {
 };
 
 function Profile(props) {
-  const UserContextInstance = useContext(UserContext);
+  //const UserContextInstance = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useReducer(reducer, initialInfo);
@@ -71,38 +71,38 @@ function Profile(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    db.collection("profiles")
-      .doc(UserContextInstance.authentication.id)
-      .set({
-        ...info,
-      })
-      .then(function () {
-        alert("Document successfully written!");
-      })
-      .catch(function (error) {
-        alert("Error writing document: ", error);
-      });
+    // db.collection("profiles")
+    //   .doc(UserContextInstance.authentication.id)
+    //   .set({
+    //     ...info,
+    //   })
+    //   .then(function () {
+    //     alert("Document successfully written!");
+    //   })
+    //   .catch(function (error) {
+    //     alert("Error writing document: ", error);
+    //   });
   };
 
   useEffect(() => {
-    if (!UserContextInstance.authentication.isLogin) {
-      history.push({
-        pathname: "/login",
-        state: { from: location.pathname },
-      });
-      return;
-    }
+    // if (!UserContextInstance.authentication.isLogin) {
+    //   history.push({
+    //     pathname: "/login",
+    //     state: { from: location.pathname },
+    //   });
+    //   return;
+    // }
 
     if (window.navigator.onLine) {
-      db.collection("profiles")
-        .doc(UserContextInstance.authentication.id)
-        .get()
-        .then((querySnapshot) => {
-          setInfo({
-            value: querySnapshot.data(),
-          });
-          localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
-        });
+      // db.collection("profiles")
+      //   .doc(UserContextInstance.authentication.id)
+      //   .get()
+      //   .then((querySnapshot) => {
+      //     setInfo({
+      //       value: querySnapshot.data(),
+      //     });
+      //     localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
+      //   });
     } else {
       setInfo({
         value: JSON.parse(localStorage.getItem("data")),

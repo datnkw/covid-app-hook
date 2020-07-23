@@ -27,7 +27,7 @@ function RenderCountryInfo(props) {
 }
 
 function App(props) {
-  const UserContextInstance = useContext(UserContext);
+  //const UserContextInstance = useContext(UserContext);
 
   const [hasShowOffSplashScreen, setHasShowOffSplashScreen] = useState(false);
   const [authentication, setAuthentication] = useState({
@@ -39,9 +39,9 @@ function App(props) {
   const checkLogin = async () => {
     await firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        UserContextInstance.login(user.email, user.uid);
+        //UserContextInstance.login(user.email, user.uid);
         
-        setAuthentication({...UserContextInstance.authentication});
+        //setAuthentication({...UserContextInstance.authentication});
       }
     });
   };
@@ -74,13 +74,7 @@ function App(props) {
   }
 
     return (
-      <UserContext.Provider
-        value={{
-          authentication: authentication,
-          logout: logout,
-          login: login,
-        }}
-      >
+      
         <div className="App">
           <Router>
             <NotiOffline />
@@ -116,7 +110,6 @@ function App(props) {
             </Switch>{" "}
           </Router>{" "}
         </div>
-      </UserContext.Provider>
     );
   
 }
