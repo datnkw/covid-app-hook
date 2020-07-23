@@ -4,10 +4,11 @@ import StyleSplashScreen from "../../components/SplashScreen/SplashScreen.module
 import className from "classnames";
 import Firebase from "../../utils/Firebase";
 import { useHistory, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { login } from "../../redux/actions";
 
-function Login() {
+
+function Login({login}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -15,11 +16,7 @@ function Login() {
   const history = useHistory();
   const location = useLocation();
 
-  const dispatch = useDispatch();
-
   const handleLogin = async (event) => {
-    //console.log("event: ", event);
-
     event.preventDefault();
 
     if (!window.navigator.onLine) {
@@ -37,11 +34,11 @@ function Login() {
 
           await Firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-              dispatch(login(
+              login(
                 {
                   email: user.email, 
                   id: user.uid
-                }));
+                });
               history.push(
                 location.state ? location.state.from : "/"
               );
@@ -78,4 +75,4 @@ function Login() {
   
 }
 
-export default Login;
+export default connect(null, {login})(Login);
