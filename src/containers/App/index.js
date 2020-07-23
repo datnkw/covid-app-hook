@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Dashboard from "../Dashboard";
 import CountryInfo from "../CountryItem";
 import Profile from "../Profile";
 import Login from "../Login";
-import { UserContext } from "../../utils/UserContext";
+import { connect } from "react-redux";
 import NotiOffline from "../../components/NotiOffline";
 import firebase from "../../utils/Firebase";
+import { login } from "../../redux/actions";
 import "../../styles/App.css";
 
 import {
@@ -26,7 +27,12 @@ function RenderCountryInfo(props) {
   );
 }
 
-function App(props) {
+const mapStateToProps = state => {
+  const { auth } = state;
+  return { auth };
+};
+
+function App({auth, login}) {
   //const UserContextInstance = useContext(UserContext);
 
   const [hasShowOffSplashScreen, setHasShowOffSplashScreen] = useState(false);
@@ -39,9 +45,12 @@ function App(props) {
   const checkLogin = async () => {
     await firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        //UserContextInstance.login(user.email, user.uid);
-        
-        //setAuthentication({...UserContextInstance.authentication});
+        login(
+          {
+            email: user.email, 
+            id: user.uid
+          });
+        setAuthentication({...auth});
       }
     });
   };
@@ -54,13 +63,13 @@ function App(props) {
     checkLogin();
   }, [])
 
-  const login = (email, id) => {
-    setAuthentication({
-        isLogin: true, 
-        email,
-        id
-      })
-  }
+  // const login = (email, id) => {
+  //   setAuthentication({
+  //       isLogin: true, 
+  //       email,
+  //       id
+  //     })
+  // }
 
   const logout = async () => {
     await firebase.auth().signOut().catch(function(error) {
@@ -113,4 +122,4 @@ function App(props) {
     );
   
 }
-export default App;
+export default connect(mapStateToProps, {login})(App);

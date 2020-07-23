@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext, useReducer } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import Styles from "./Profile.module.css";
 import Firebase from "../../utils/Firebase";
 import Loading from "../../components/Loading";
 import SideBar from "../../components/SideBar";
 import className from "classnames";
 import SplashScreen from "../../components/SplashScreen";
-import { UserContext } from "../../utils/UserContext";
 import { useHistory, useLocation } from "react-router-dom";
+import { connect } from "react-redux";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -50,6 +50,11 @@ const initialInfo = {
   meetRelatedCovid: "",
 };
 
+const mapStateToProps = state => {
+  const { auth } = state;
+  return { auth };
+};
+
 function Profile(props) {
   //const UserContextInstance = useContext(UserContext);
 
@@ -71,38 +76,38 @@ function Profile(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // db.collection("profiles")
-    //   .doc(UserContextInstance.authentication.id)
-    //   .set({
-    //     ...info,
-    //   })
-    //   .then(function () {
-    //     alert("Document successfully written!");
-    //   })
-    //   .catch(function (error) {
-    //     alert("Error writing document: ", error);
-    //   });
+    db.collection("profiles")
+      .doc(props.auth.id)
+      .set({
+        ...info,
+      })
+      .then(function () {
+        alert("Document successfully written!");
+      })
+      .catch(function (error) {
+        alert("Error writing document: ", error);
+      });
   };
 
   useEffect(() => {
-    // if (!UserContextInstance.authentication.isLogin) {
-    //   history.push({
-    //     pathname: "/login",
-    //     state: { from: location.pathname },
-    //   });
-    //   return;
-    // }
+    if (!props.auth.isLogin) {
+      history.push({
+        pathname: "/login",
+        state: { from: location.pathname },
+      });
+      return;
+    }
 
     if (window.navigator.onLine) {
-      // db.collection("profiles")
-      //   .doc(UserContextInstance.authentication.id)
-      //   .get()
-      //   .then((querySnapshot) => {
-      //     setInfo({
-      //       value: querySnapshot.data(),
-      //     });
-      //     localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
-      //   });
+      db.collection("profiles")
+        .doc(props.auth.id)
+        .get()
+        .then((querySnapshot) => {
+          setInfo({
+            value: querySnapshot.data(),
+          });
+          localStorage.setItem("data", JSON.stringify(querySnapshot.data()));
+        });
     } else {
       setInfo({
         value: JSON.parse(localStorage.getItem("data")),
@@ -156,4 +161,4 @@ function Profile(props) {
   );
 }
 
-export default Profile;
+export default connect(mapStateToProps)(Profile);
