@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Loading from "../../components/Loading";
 import config from "../../utils/config.json";
-import InfoByCase from "../../components/InfoByCase";
-import SplashScreen from "../../components/SplashScreen";
-import Pagination from "../../components/Pagination";
-import SideBar from "../../components/SideBar";
+import {InfoByCase, SplashScreen, Pagination, SideBar, usePaginationData, Loading} from "../../components";
 import className from "classnames";
 import { useRouteMatch } from "react-router-dom";
-import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
 import checkShouldReloadData from "../../utils/checkNessaryLoadData";
 import { connect } from "react-redux";

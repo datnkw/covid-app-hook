@@ -36,53 +36,45 @@ function ItemSideBarList(props) {
 }
 
 const AuthBtn = (props) => {
-
-
-        return (
-          <div className={Styles.authWrapper}>
-            <div
-              className={className(
-                Styles.btnHolder,
-                props.auth.isLogin ? "hidden" : ""
-              )}
-            >
-              <div className={Styles.authBtn} onClick={props.goToLogin}>
-                {" "}
-                Login{" "}
-              </div>{" "}
-            </div>{" "}
-            <div
-              className={className(
-                Styles.btnHolder,
-                props.auth.isLogin ? "" : "hidden"
-              )}
-            >
-              <p> {props.auth.email} </p>{" "}
-              <div className={Styles.authBtn} onClick={() => props.doTheLogout()}>
-                {" "}
-                Logout{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>
-        );
-
+  return (
+    <div className={Styles.authWrapper}>
+      <div
+        className={className(
+          Styles.btnHolder,
+          props.auth.isLogin ? "hidden" : ""
+        )}
+      >
+        <div className={Styles.authBtn} onClick={props.goToLogin}>
+          {" "}
+          Login{" "}
+        </div>{" "}
+      </div>{" "}
+      <div
+        className={className(
+          Styles.btnHolder,
+          props.auth.isLogin ? "" : "hidden"
+        )}
+      >
+        <p> {props.auth.email} </p>{" "}
+        <div className={Styles.authBtn} onClick={() => props.doTheLogout()}>
+          {" "}
+          Logout{" "}
+        </div>{" "}
+      </div>{" "}
+    </div>
+  );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const { auth } = state;
   return { auth };
 };
 
-function SideBar({
-  itemSideBarChoosen,
-  auth,
-  logout
-}) {
+function SideBar({ itemSideBarChoosen, auth, logout }) {
   const [isHiddenSideBar, setIsHiddenSideBar] = useState(true);
 
   const location = useLocation();
   const history = useHistory();
-
 
   const doTheLogout = () => {
     firebase
@@ -95,7 +87,6 @@ function SideBar({
   };
 
   const goToLogin = () => {
-
     history.push({
       pathname: "/login",
       state: { from: location.pathname },
@@ -121,8 +112,6 @@ function SideBar({
     },
   ];
 
-
-
   return (
     <div
       className={className(
@@ -138,7 +127,7 @@ function SideBar({
         itemSideBarChoosen={itemSideBarChoosen}
       />
 
-      <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} auth={auth}/>
+      <AuthBtn goToLogin={goToLogin} doTheLogout={doTheLogout} auth={auth} />
 
       <button className={Styles.menuBtnWrapper} onClick={switchSideBar}>
         <div className={Styles.menuBtn}></div>
@@ -149,4 +138,4 @@ function SideBar({
   );
 }
 
-export default connect(mapStateToProps, {logout})(SideBar);
+export default connect(mapStateToProps, { logout })(SideBar);

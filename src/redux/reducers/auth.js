@@ -11,6 +11,7 @@ export default function(state = initialState, action) {
     case LOGIN: {
       const { email, id } = action.payload;
       return {
+        ...state,
         email,
         id,
         isLogin: true
@@ -18,6 +19,7 @@ export default function(state = initialState, action) {
     }
     case LOGOUT: {
       return {
+        ...state,
         email: '',
         id: '',
         isLogin: false
