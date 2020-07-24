@@ -10,10 +10,14 @@ import { Link } from "react-router-dom";
 import Styles from "./Dashboard.module.css";
 
 import _ from "lodash";
-import isNeededToReloadData from "../../utils/checkNessaryLoadData";
+import checkShouldReloadData from "../../utils/checkNessaryLoadData";
 
 import Pagination from "../../components/Pagination";
 import usePaginationData from "../../components/usePaginationData";
+
+import { connect } from "react-redux";
+import { updateWorldInfo } from "../../redux/actions";
+import { getWorldInfoByName } from "../../redux/selectors";
 
 const ITEM_PER_PAGE = 15;
 const DEFAULT_URL = "/world";
@@ -46,6 +50,11 @@ function CountryItemList({
     : null;
 }
 
+const mapStateToProps = state => {
+  const worldInfo = getWorldInfoByName(state, 'world');
+  return { worldInfo };
+};
+
 function Dashboard(props) {
   const [loading, setLoading] = useState(true);
   const [summaryGlobalInfo, setSummaryGlobalInfo] = useState({});
@@ -63,34 +72,26 @@ function Dashboard(props) {
   const fetchData = async () => {
     const url = config.api + "/summary";
     const isOnline = window.navigator.onLine;
-
-    if (isOnline && isNeededToReloadData("prevGetDataTime")) {
+    console.log("time: ", props.worldInfo.time);
+    if (isOnline && checkShouldReloadData(props.worldInfo.time)) {
       return axios.get(url).then((response) => {
-        const dataCountries = response.data.Countries;
-        setSummaryGlobalInfo(response.data.Global);
+        const data = response.data;
 
-        localStorage.setItem(
-          "summaryGlobalInfo",
-          JSON.stringify(response.data.Global)
-        );
-        localStorage.setItem(
-          "summaryCountries",
-          JSON.stringify(dataCountries)
-        );
-        localStorage.setItem(
-          "prevGetDataTime",
-          Date.now()/1000
-        )
+        setSummaryGlobalInfo(data.Global);
 
-        return dataCountries;
+        props.updateWorldInfo('world', data);
+
+        return data.Countries;
       });
     } else {
-      setSummaryGlobalInfo(
-        JSON.parse(localStorage.getItem("summaryGlobalInfo"))
-      );
-      const dataCountries = JSON.parse(localStorage.getItem("summaryCountries"));
 
-      return dataCountries;
+      console.log("worldInfo catched: ", props.worldInfo);
+
+      setSummaryGlobalInfo(
+        props.worldInfo.data.Global
+      );
+
+      return props.worldInfo.data.Countries;
     }
   }
 
@@ -129,4 +130,4 @@ function Dashboard(props) {
   );
 }
 
-export default Dashboard;
+export default connect(mapStateToProps, {updateWorldInfo})(Dashboard);

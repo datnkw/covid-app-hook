@@ -12,7 +12,7 @@ export const logout = () => ({
   type: LOGOUT
 })
 
-export const updateCountryInfo = (countryName, data) => ({
+export const updateWorldInfo = (countryName, data) => ({
   type: UPDATE_WORLD_INFO,
   payload: {
     countryName,

@@ -10,9 +10,9 @@ import className from "classnames";
 import { useRouteMatch } from "react-router-dom";
 import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
-import isNeededToReloadData from "../../utils/checkNessaryLoadData";
+import checkShouldReloadData from "../../utils/checkNessaryLoadData";
 import { connect } from "react-redux";
-import { updateCountryInfo } from "../../redux/actions";
+import { updateWorldInfo } from "../../redux/actions";
 import { getWorldInfoByName } from "../../redux/selectors";
 
 
@@ -79,7 +79,6 @@ function ByDateItemList(props) {
 
 const mapStateToProps = (state, ownProps) => {
   const countryInfo = getWorldInfoByName(state, ownProps.name);
-  console.log("countryInfo: ", ownProps.name);
   return { countryInfo };
 };
 
@@ -92,7 +91,7 @@ function CountryInfo(props) {
     setItemSideBarChoosen,
     setVisibilitySplashScreen,
 
-    updateCountryInfo,
+    updateWorldInfo,
     countryInfo
   } = props;
 
@@ -114,11 +113,11 @@ function CountryInfo(props) {
   const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if (window.navigator.onLine && isNeededToReloadData(countryInfo.time)) {
+    if (window.navigator.onLine && checkShouldReloadData(countryInfo.time)) {
       return await axios.get(url).then((response) => {
         const data = response.data;
 
-        updateCountryInfo(countryName, data);
+        updateWorldInfo(countryName, data);
 
         return data;
       }).catch(error => {
@@ -169,4 +168,4 @@ function CountryInfo(props) {
   );
 }
 
-export default connect(mapStateToProps, {updateCountryInfo})(CountryInfo);
+export default connect(mapStateToProps, {updateWorldInfo})(CountryInfo);
