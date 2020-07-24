@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT } from "./actionTypes";
+import { LOGIN, LOGOUT, UPDATE_WORLD_INFO } from "./actionTypes";
 
 export const login = ({email, id}) => ({
   type: LOGIN,
@@ -10,4 +10,13 @@ export const login = ({email, id}) => ({
 
 export const logout = () => ({
   type: LOGOUT
+})
+
+export const updateCountryInfo = (countryName, data) => ({
+  type: UPDATE_WORLD_INFO,
+  payload: {
+    countryName,
+    data,
+    time: Date.now()/1000
+  }
 })

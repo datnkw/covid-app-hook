@@ -56,8 +56,6 @@ const mapStateToProps = state => {
 };
 
 function Profile(props) {
-  //const UserContextInstance = useContext(UserContext);
-
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useReducer(reducer, initialInfo);
   const [db] = useState(Firebase.firestore());

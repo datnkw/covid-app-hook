@@ -22,8 +22,13 @@ function CountryItem(props) {
   const { Country, TotalConfirmed } = props.info;
   const itemUrl = "/country/" + Country;
 
+  const LinkObject = {
+    pathname: itemUrl,
+    state: { name: Country }
+  }
+
   return (
-    <Link to={itemUrl}>
+    <Link to={LinkObject}>
       <div className={Styles.countryItem}>
         <p> {Country} </p> <p> {TotalConfirmed} </p>{" "}
       </div>{" "}

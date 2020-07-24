@@ -62,6 +62,7 @@ function Pagination(props) {
   const { page, maxPage, setPage } = props;
 
   console.log("current page: ", page);
+  console.log("maxPage: ", maxPage);
 
   useEffect(() => {
     setValueBtn(calcPageNumberBtn(page, maxPage));

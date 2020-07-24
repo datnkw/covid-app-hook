@@ -73,8 +73,6 @@ const mapStateToProps = state => {
   return { auth };
 };
 
-
-
 function SideBar({
   itemSideBarChoosen,
   auth,

@@ -11,6 +11,9 @@ import { useRouteMatch } from "react-router-dom";
 import usePaginationData from "../../components/usePaginationData";
 import Styles from "./CountryInfo.module.css";
 import isNeededToReloadData from "../../utils/checkNessaryLoadData";
+import { connect } from "react-redux";
+import { updateCountryInfo } from "../../redux/actions";
+import { getWorldInfoByName } from "../../redux/selectors";
 
 
 const ITEM_PER_PAGE = 5;
@@ -74,6 +77,12 @@ function ByDateItemList(props) {
   return <div> {result} </div>;
 }
 
+const mapStateToProps = (state, ownProps) => {
+  const countryInfo = getWorldInfoByName(state, ownProps.name);
+  console.log("countryInfo: ", ownProps.name);
+  return { countryInfo };
+};
+
 function CountryInfo(props) {
   const match = useRouteMatch();
 
@@ -82,6 +91,9 @@ function CountryInfo(props) {
     hasShowOffSplashScreen,
     setItemSideBarChoosen,
     setVisibilitySplashScreen,
+
+    updateCountryInfo,
+    countryInfo
   } = props;
 
   const getCountryName = () => {
@@ -98,40 +110,30 @@ function CountryInfo(props) {
     setData,
     maxPage
   } = usePaginationData(ITEM_PER_PAGE, '/country/' + countryName);
-
-  const isSameCountryName = (countryName) => {
-    return countryName === localStorage.getItem("country");
-  }
-
+  console.log("max page in countryItem: ", maxPage);
   const fetchData = async () => {
     const url = config.api + "/dayone/country/" + countryName;
 
-    if ((window.navigator.onLine && isNeededToReloadData("prevGetDataCountryTime")) || !isSameCountryName(countryName)) {
+    if (window.navigator.onLine && isNeededToReloadData(countryInfo.time)) {
       return await axios.get(url).then((response) => {
         const data = response.data;
 
-        localStorage.setItem("maxPage", maxPage);
-        localStorage.setItem("data", JSON.stringify(data));
-        localStorage.setItem(
-          "prevGetDataCountryTime",
-          Date.now()/1000
-        )
-        localStorage.setItem("country", countryName)
+        updateCountryInfo(countryName, data);
 
         return data;
       }).catch(error => {
-        console.log("error get info country");
-        console.log(error);
-
+        alert("get data country error");
         return [];
       });
     } else {
-      return JSON.parse(localStorage.getItem("data"))
+      console.log("countryInfo catched: ", countryInfo);
+      return countryInfo.data;
     }
   }
 
   const getInfo = async () => {
     const dataCountry = await fetchData();
+    console.log("dataCountry in countryItem: ", dataCountry);
     setData(dataCountry);
     setLoading(false);
     setVisibilitySplashScreen();
@@ -167,4 +169,4 @@ function CountryInfo(props) {
   );
 }
 
-export default CountryInfo;
+export default connect(mapStateToProps, {updateCountryInfo})(CountryInfo);

@@ -14,10 +14,13 @@ import {
   Switch,
   Route,
   useParams,
+  useLocation
 } from "react-router-dom";
 
 function RenderCountryInfo(props) {
   let { name } = useParams();
+
+  //const location = useLocation();
   return (
     <CountryInfo
       name={name}
@@ -33,14 +36,13 @@ const mapStateToProps = state => {
 };
 
 function App({auth, login}) {
-  //const UserContextInstance = useContext(UserContext);
-
   const [hasShowOffSplashScreen, setHasShowOffSplashScreen] = useState(false);
   const [authentication, setAuthentication] = useState({
     isLogin: false, 
     email: null, 
     id: null 
   })
+
 
   const checkLogin = async () => {
     await firebase.auth().onAuthStateChanged((user) => {
@@ -63,25 +65,6 @@ function App({auth, login}) {
     checkLogin();
   }, [])
 
-  // const login = (email, id) => {
-  //   setAuthentication({
-  //       isLogin: true, 
-  //       email,
-  //       id
-  //     })
-  // }
-
-  const logout = async () => {
-    await firebase.auth().signOut().catch(function(error) {
-      alert("log out failed");
-    });
-    setAuthentication({
-      isLogin: false, 
-        email: null,
-        id: null
-    })
-  }
-
     return (
       
         <div className="App">
@@ -97,6 +80,7 @@ function App({auth, login}) {
               </Route>{" "}
               <Route path="/country/:name">
                 <RenderCountryInfo
+                  
                   hasShowOffSplashScreen={hasShowOffSplashScreen}
                   setVisibilitySplashScreen={setVisibilitySplashScreen}
                 />{" "}
